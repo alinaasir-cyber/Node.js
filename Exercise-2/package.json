@@ -1,0 +1,17 @@
+{
+  "name": "books-api",
+  "version": "1.0.0",
+  "description": "MongoDB CRUD API for books",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "mongodb": "^7.8.0",
+    "mongoose": "^8.8.4"
+  }
+}
