@@ -1,12 +1,17 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { loginSchema, registerSchema } from "../src/validators/auth.js";
+import { loginSchema, registerSchema } from "../Back-end/validators/auth.js";
 import {
   createTransactionSchema,
   listTransactionsSchema,
   monthlySummarySchema,
   updateTransactionSchema
-} from "../src/validators/transactions.js";
+} from "../Back-end/validators/transactions.js";
+import {
+  createTaskSchema,
+  taskIdSchema,
+  updateTaskSchema
+} from "../Back-end/validators/tasks.js";
 
 test("registration trims names and normalizes email", () => {
   const result = registerSchema.safeParse({
@@ -61,15 +66,40 @@ test("monthly summary requires a valid month and year", () => {
 
 test("transaction updates reject empty bodies and malformed identifiers", () => {
   assert.equal(updateTransactionSchema.safeParse({
-    params: { id: "0123456789abcdef01234567" },
+    params: { id: "a0b1c2d3-e4f5-4678-9012-abcdefabcdef" },
     body: { title: "Updated" }
   }).success, true);
   assert.equal(updateTransactionSchema.safeParse({
-    params: { id: "not-an-object-id" },
+    params: { id: "0123456789abcdef01234567" },
     body: { title: "Updated" }
   }).success, false);
   assert.equal(updateTransactionSchema.safeParse({
-    params: { id: "0123456789abcdef01234567" },
+    params: { id: "a0b1c2d3-e4f5-4678-9012-abcdefabcdef" },
     body: {}
   }).success, false);
+});
+
+test("task creation requires a non-empty title and trims whitespace", () => {
+  const result = createTaskSchema.safeParse({ body: { title: "  Study React  " } });
+  assert.equal(result.success, true);
+  assert.deepEqual(result.data.body, { title: "Study React" });
+  assert.equal(createTaskSchema.safeParse({ body: { title: "   " } }).success, false);
+});
+
+test("task updates validate identifiers and require at least one field", () => {
+  assert.equal(updateTaskSchema.safeParse({
+    params: { id: "a0b1c2d3-e4f5-4678-9012-abcdefabcdef" },
+    body: { completed: true }
+  }).success, true);
+  assert.equal(updateTaskSchema.safeParse({
+    params: { id: "0123456789abcdef01234567" },
+    body: { completed: true }
+  }).success, false);
+  assert.equal(updateTaskSchema.safeParse({
+    params: { id: "a0b1c2d3-e4f5-4678-9012-abcdefabcdef" },
+    body: {}
+  }).success, false);
+  assert.equal(taskIdSchema.safeParse({
+    params: { id: "a0b1c2d3-e4f5-4678-9012-abcdefabcdef" }
+  }).success, true);
 });
