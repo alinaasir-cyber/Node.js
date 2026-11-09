@@ -1,4 +1,4 @@
-const API_ROOT = '/backend/api/v1'
+const API_ROOT = import.meta.env.PROD ? '/api/v1' : '/backend/api/v1'
 export const DEMO_TOKEN = 'ledgerly-local-demo'
 const DEMO_TRANSACTIONS_KEY = 'ledgerly-demo-transactions'
 const DEMO_ACCOUNTS_KEY = 'ledgerly-demo-accounts'

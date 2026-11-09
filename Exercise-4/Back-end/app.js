@@ -1,4 +1,6 @@
 import express from "express";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
@@ -18,6 +20,8 @@ import financeRoutes from "./routes/financeRoutes.js";
 
 const app = express();
 const allowedOrigins = env.CLIENT_ORIGIN.split(",").map((origin) => origin.trim());
+const frontendDirectory = fileURLToPath(new URL("../Front-end/dist", import.meta.url));
+const frontendEntry = path.join(frontendDirectory, "index.html");
 
 app.use(helmet());
 app.use(cors({
@@ -48,6 +52,15 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/v1/categories", categoryRoutes);
 app.use("/api/v1/upload", uploadRoutes);
 app.use("/api/v1/admin", adminRoutes);
+if (env.NODE_ENV === "production") {
+  app.use(express.static(frontendDirectory));
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api/")) return next();
+    res.sendFile(frontendEntry, (error) => {
+      if (error) next(error);
+    });
+  });
+}
 app.use(notFound);
 app.use(errorHandler);
 

@@ -18,6 +18,23 @@ A Node.js and Express API using Neon PostgreSQL to track income and expenses.
 
 The server will not start if required environment values are invalid or Neon cannot be reached.
 
+## Deploy the full app on Render
+
+Create one Render **Web Service** from this repository and set its root directory to `Exercise-4`.
+
+- Build command: `npm ci && npm ci --prefix Front-end && npm run build --prefix Front-end`
+- Start command: `npm start`
+- Health check path: `/health`
+
+Add these environment variables in Render's service settings:
+
+- `NODE_ENV`: `production`
+- `DATABASE_URL`: your Neon PostgreSQL connection string
+- `JWT_SECRET`: a private random value of at least 32 characters
+- `JWT_EXPIRES_IN`: `7d` (optional; this is the default)
+
+Render provides `PORT` automatically. The production server serves the built Vite frontend and API from the same origin, so the frontend does not need a separate API URL or CORS origin. Do not add database credentials or JWT secrets to the frontend project's environment variables.
+
 ## Endpoints
 
 All API endpoints are under `/api/v1`.
